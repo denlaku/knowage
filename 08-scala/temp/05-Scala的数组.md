@@ -1,9 +1,9 @@
 # Scala的数组
 
-### 1、定长数组和变长数组
+## 一、定长数组和变长数组
 
 ```scala
-object TestScala {
+object ArrayTest {
   def main(args: Array[String]) {
     //初始化一个长度为8的定长数组，其所有元素均为0
     val arr1 = new Array[Int](8)
@@ -45,10 +45,9 @@ object TestScala {
 }
 ```
 
-### 2、遍历数组
+## 二、遍历数组
 
 （1）增强for循环
-
 （2）好用的until会生成脚标，**0 until 10 包含0不包含10**
 
 ```scala
@@ -67,7 +66,7 @@ def main(args: Array[String]) {
 }
 ```
 
-### 3、数组转换
+## 3、数组转换
 
 **yield**关键字将原始的数组进行转换会产生一个新的数组，原始的数组不变
 
