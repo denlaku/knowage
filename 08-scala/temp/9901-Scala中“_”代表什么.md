@@ -19,4 +19,4 @@ val (first, second, third) = t
 6、还有一点，下划线_代表的是某一类型的默认值。
 对于Int来说，它是0。
 对于Double来说，它是0.0
-对于引用类型，它是null。  
+对于引用类型，它是null。 
