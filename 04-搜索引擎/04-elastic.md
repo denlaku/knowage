@@ -16,8 +16,20 @@ vi /etc/security/limits.d/90-nproc.conf
 * soft nproc 2048
 ```
 
-vi /etc/sysctl.conf  
+vim /etc/sysctl.conf  
 
 ```
 vm.max_map_count=655360
 ```
+
+
+
+```shell
+vim /etc/security/limits.conf
+elasticsearch - nofile 65536
+* soft nofile 65536
+* hard nofile 131072
+* soft nproc 2048
+* hard nproc 4096
+```
+
