@@ -1,15 +1,6 @@
-vi /etc/security/limits.d/90-nproc.conf 
+vim /etc/security/limits.d/20-nproc.conf 
 
-```
-* soft nofile 65536
-* hard nofile 131072
-* soft nproc 2048
-* hard nproc 4096
-```
-
-vi /etc/security/limits.d/90-nproc.conf 
-
-```
+```shell
 修改如下内容：
 * soft nproc 1024
 #修改为
@@ -18,18 +9,16 @@ vi /etc/security/limits.d/90-nproc.conf
 
 vim /etc/sysctl.conf  
 
-```
+```shell
 vm.max_map_count=655360
 ```
 
-
+vim /etc/security/limits.conf
 
 ```shell
-vim /etc/security/limits.conf
-elasticsearch - nofile 65536
 * soft nofile 65536
-* hard nofile 131072
-* soft nproc 2048
-* hard nproc 4096
+* hard nofile 65536
+* soft nproc 65536
+* hard nproc 65536
 ```
 

@@ -1,12 +1,8 @@
-#### **安装前准备**
+## mysql安装
 
-2套CentOS7环境
-`10.10.10.21`
-`10.10.10.22`
-安装包：
-` mysql-5.7.23-el7-x86_64.tar.g`
+### 一、单机安装
 
-#### **上传安装包至目录`/usr/local/`并解压**
+**上传安装包并解压**，这里把mysql安装到目录`/usr/local/`
 
 ```shell
 cd /usr/local/
@@ -14,7 +10,7 @@ tar -xvf mysql-5.7.23-el7-x86_64.tar.g
 mv mysql-5.7.23-el7-x86_64 mysql
 ```
 
-#### **创建mysql用户组及用户，并授权**
+**创建mysql用户组及用户并授权**
 
 ```shell
 groupadd mysql
@@ -23,7 +19,7 @@ chown -R mysql /usr/local/mysql
 chgrp -R mysql /usr/local/mysql
 ```
 
-#### **创建配置文件`my.cnf`并添加如下配置**
+**创建配置文件`my.cnf`并添加如下配置**
 
 ```shell
 [client]
@@ -42,10 +38,10 @@ log-error=/var/log/mysqld.log
 lower_case_table_names = 1
 ```
 
-#### **初始化数据库**
+**初始化数据库**
 
 ```shell
-#手动编辑一下日志文件，什么也不用写，直接保存退出
+# 创建日志文件，什么也不用写，直接保存退出
 cd /var/log/
 vim mysqld.log
 
@@ -55,7 +51,7 @@ chown mysql:mysql mysqld.log
 /usr/local/mysql/bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data --lc_messages_dir=/usr/local/mysql/share --lc_messages=en_US
 ```
 
-#### **查看初始密码**
+**查看初始密码**
 
 ```shell
 cat /var/log/mysqld.log
@@ -67,7 +63,7 @@ cat /var/log/mysqld.log
 grep "password" /var/log/mysqld.log
 ```
 
-#### **启动mysql服务，修改初始密码**
+**启动mysql服务，修改初始密码**
 
 ```shell
 /usr/local/mysql/support-files/mysql.server start
@@ -78,7 +74,7 @@ grant all privileges on *.* to 'root'@'%' identified by 'new_pwd';
 flush privileges;
 ```
 
-#### **设置开机自启**
+**设置开机自启**
 
 ```shell
 cd /usr/local/mysql/support-files
@@ -92,10 +88,9 @@ ln -s /usr/local/mysql/bin/mysql /usr/bin
 
 ------
 
-#### 主从复制
+### 二、主从复制
 
 主库IP：`10.10.10.21`
-
 从库IP：`10.10.10.22`
 
 主库创建数据同步用户并授权
@@ -117,7 +112,7 @@ server-id=21 #mysql服务ID(必须唯一)
 
 ```shell
 [mysqld]
-server-id=21 #mysql服务ID(必须唯一)
+server-id=22 #mysql服务ID(必须唯一)
 ```
 
 获取主库binlog文件名称及pos位置信息，执行 `show master status;`
@@ -138,6 +133,5 @@ master_log_pos=696;
 ```
 
 启动从库复制，执行 `start slave;`
-
 停止从库复制，执行  `stop slave;`
 

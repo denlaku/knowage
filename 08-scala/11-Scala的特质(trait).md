@@ -7,7 +7,8 @@
  * // Scala中的Triat是一种特殊的概念
 // 首先我们可以将Trait作为接口来使用，此时的Triat就与Java中的接口非常类似
 // 在triat中可以定义抽象方法，就与抽象类中的抽象方法一样，只要不给出方法的具体实现即可
-// 类可以使用extends关键字继承trait，注意，这里不是implement，而是extends，在scala中没有implement的概念，无论继承类还是trait，统一都是extends
+// 类可以使用extends关键字继承trait，注意，这里不是implement，而是extends，
+// 在scala中没有implement的概念，无论继承类还是trait，统一都是extends
 // 类继承trait后，必须实现其中的抽象方法，实现时不需要使用override关键字
 // scala不支持对类进行多继承，但是支持多重继承trait，使用with关键字即可
  */
@@ -116,7 +117,8 @@ object Test{
 
 ```scala
 /**
- * // 有时我们可以在创建类的对象时，指定该对象混入某个trait，这样，就只有这个对象混入该trait的方法，而类的其他对象则没有
+有时我们可以在创建类的对象时，指定该对象混入某个trait，
+这样，就只有这个对象混入该trait的方法，而类的其他对象则没有
  */
 trait Logged {
   def log(msg:String){}
@@ -134,7 +136,7 @@ trait BMyLogger extends Logged{
 }
 class Person(val name:String) extends AMyLogger{
   def sayHello(): Unit ={
-    println("Hi ,i'm name")
+    println("Hi ,i'm " + name)
     log("sayHello is invoked!")
   }
 }
@@ -153,7 +155,8 @@ object  Test{
 
 ```scala
 /**
- * // Scala中支持让类继承多个trait后，依次调用多个trait中的同一个方法，只要让多个trait的同一个方法中，在最后都执行super.方法 即可
+// Scala中支持让类继承多个trait后，依次调用多个trait中的同一个方法，
+// 只要让多个trait的同一个方法中，在最后都执行super.方法即可
 // 类中调用多个trait中都有的这个方法时，首先会从最右边的trait的方法开始执行，然后依次往左执行，形成一个调用链条
 // 这种特性非常强大，其实就相当于设计模式中的责任链模式的一种具体实现依赖
  */

@@ -50,7 +50,7 @@ object Test {
 object Test {
    def main(args: Array[String]) {
        val alice = new Person("Alice", 25)
-    val bob = new Person("Bob", 32)
+       val bob = new Person("Bob", 32)
        val charlie = new Person("Charlie", 32)
    
     for (person <- List(alice, bob, charlie)) {
