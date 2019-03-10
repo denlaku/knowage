@@ -29,9 +29,9 @@ vi /etc/hosts
 
 ```shell
 # 
-systemctl stop firewalld
+systemctl stop firewalld.service
 # 
-systemctl disable firewalld
+systemctl disable firewalld.service
 ```
 
 5、 关闭SELinux

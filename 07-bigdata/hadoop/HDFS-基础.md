@@ -29,6 +29,8 @@ HDFS：Hadoop Distributed File System ，Hadoop分布式文件系统，主要用
 
 hdfs运行在廉价的机器上，保存多个副本，且提供容错机制，副本丢失或宕机自动恢复（默认存3份），适合大数据的处理。hdfs默认会将文件分割成block，在hadoop2.x以上版本默认128M为1个block。然后将block按键值对存储在HDFS上，并将键值对的映射存到内存中。如果小文件太多，那内存的负担会很重。
 
+![1552256598708](D:\denlaku.git\knowage\07-bigdata\hadoop\imgs\1552256598708.png)
+
 HDFS也是按照Master和Slave的结构。分NameNode、SecondaryNameNode、DataNode这几个角色。
 **NameNode**：是Master节点，是大领导。管理数据块映射；处理客户端的读写请求；配置副本策略；管理HDFS的名称空间。　namenode内存中存储的是=fsimage+edits。
 **SecondaryNameNode**：是一个小弟，分担大哥namenode的工作量；是NameNode的冷备份；负责定时（默认1小时）从namenode上，获取fsimage和edits来进行合并，然后再发送给namenode。减少namenode的工作量。

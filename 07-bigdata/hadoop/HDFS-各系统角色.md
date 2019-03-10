@@ -63,7 +63,7 @@ dfs.namenode.checkpoint.txns=1000000 ##两次 checkpoint 之间最大的操作�
 
 #### CheckPoint 附带作用
 
-Namenode 和 SecondaryNamenode 的工作目录存储结构完全相同，所以，当 Namenode 故障 退出需要重新恢复时，可以从SecondaryNamenode的工作目录中将fsimage拷贝到Namenode 的工作目录，以恢复 namenode 的元数据
+Namenode 和 SecondaryNamenode 的工作目录存储结构完全相同，所以，当 Namenode 故障退出需要重新恢复时，可以从SecondaryNamenode的工作目录中将fsimage拷贝到Namenode 的工作目录，以恢复 namenode 的元数据
 
 
 

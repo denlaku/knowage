@@ -8,7 +8,15 @@
 1、starter.jar 完成相关jar包的引入
 2、autoConfigure.jar完成自动配置
 
+#### @Value 与@ConfigurationProperties的区别
 
+|              | @Value       | @ConfigurationProperties           |
+| ------------ | ------------ | ---------------------------------- |
+| 功能         | 一个一个指定 | 批量注入配置文件中的属性           |
+| 松散语法     | 不支持       | 支持，如fistName和first-name都可以 |
+| SpEL         | 支持         | 不支持                             |
+| JSR303校验   | 不支持       | 支持 javax.validation              |
+| 复杂类型封装 | 不支持       | 支持                               |
 
 @Value 一个个指定属性，不支持复杂类型封装，支持SpEL
 
@@ -37,7 +45,8 @@ application-dev.properties、application-prod.properties
 
 
 
-配置文件加载位置
+#### 配置文件加载位置
+
 springboot 启动会扫描以下位置的application.properties或者application.yml文件作为Spring boot的默认配置文
 件
 –file:./config/  项目根路径
@@ -50,20 +59,32 @@ SpringBoot会从这四个位置全部加载主配置文件；互补配置；
 我们还可以通过spring.config.location来改变默认的配置文件位置
 项目打包好以后，我们可以使用命令行参数的形式，启动项目的时候来指定配置文件的新位置；指定配置文件和默
 认加载的这些配置文件共同起作用形成互补配置；
-java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --spring.config.location=G:/application.properties
+org.springframework.boot.context.config.ConfigFileApplicationListener
 
 
 
 1. 命令行参数
+
+   java -jar spring-boot-02-config-02-0.0.1-SNAPSHOT.jar --spring.config.location=G:/application.properties
+
 2. 来自java:comp/env的JNDI属性
+
 3. Java系统属性（System.getProperties()）
+
 4. 操作系统环境变量
+
 5. RandomValuePropertySource配置的random.*属性值
+
 6. jar包外部的application-{profile}.properties或application.yml(带spring.profile)配置文件
+
 7. jar包内部的application-{profile}.properties或application.yml(带spring.profile)配置文件
+
 8. jar包外部的application.properties或application.yml(不带spring.profile)配置文件
+
 9. jar包内部的application.properties或application.yml(不带spring.profile)配置文件
+
 10. @Configuration注解类上的@PropertySource
+
 11. 通过SpringApplication.setDefaultProperties指定的默认属性
 
 
