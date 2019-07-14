@@ -155,9 +155,12 @@ map keys terminated by ':';
 ### 2、加载文件中的数据至hive表中
 
 ```shell
+# 从本地导入文件文件
 load data local inpath '/home/bigdata/teacher.txt' into table teacher;
 load data local inpath '/home/bigdata/person.txt' into table person;
 load data local inpath '/home/bigdata/person.txt' into table person_pt partition(pt='201808');
+# 从hdfs导入数据，不要local
+load data local inpath '/home/bigdata/teacher.txt' into table teacher;
 ```
 
 表分区

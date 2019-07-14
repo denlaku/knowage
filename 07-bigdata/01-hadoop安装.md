@@ -240,14 +240,15 @@ hdfs namenode -format
 # 启动
 ./start-dfs.sh
 ./start-yarn.sh
+
+# IPV4_ROUTE_METRIC=100
 ```
 
 
 ​	
-​	
-​	
-​	
-​	
+​	IPV4_ROUTE_METRIC=100
+
+
 ​	
 ​	
 ​	

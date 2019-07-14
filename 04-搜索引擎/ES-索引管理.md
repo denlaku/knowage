@@ -1,8 +1,8 @@
 ## 索引详解
 
-### 索引管理
+## 索引管理
 
-##### 集群_cat
+### 集群_cat
 
 ```
 http://10.10.10.11:9200/_cat
@@ -36,9 +36,10 @@ http://10.10.10.11:9200/_cat
 /_cat/repositories
 /_cat/snapshots/{repository}
 /_cat/templates
+/_cat/health?v
 ```
 
-##### 查看集群的健康状况
+### 集群的健康状况
 
 ```
 http://10.10.10.11:9200/_cat/health?v
@@ -50,7 +51,7 @@ http://10.10.10.11:9200/_cat/health?v
 **Yellow** - all data is available but some replicas are not yet allocated (cluster is fully functional)
 **Red** - some data is not available for whatever reason (cluster is partially functional)
 
-#### 创建索引
+### 创建索引
 
 索引的名字必须是小写的，不可重名
 
@@ -100,7 +101,7 @@ PUT test
         "number_of_shards" : 1
     },
     "mappings" : {
-        "type1" : {
+        "_doc" : {
             "properties" : {
                 "field1" : { "type" : "text" }
             }
@@ -126,7 +127,7 @@ HEAD twitter
 
 HTTP status code 表示结果 404 不存在 ， 200 存在
 
-#### 删除索引
+### 删除索引
 
 ```shell
 DELETE /twitter
@@ -135,7 +136,7 @@ DELETE /twitter
 可以一次删除多个索引（以逗号间隔）
 删除所有索引   _all 或 通配符 *
 
-#### 修改索引
+### 修改索引
 
 索引的设置信息分为静态信息和动态信息两部分。静态信息不可更改，如索引的分片数。动态信息可以修改。
 
@@ -145,7 +146,7 @@ REST 访问端点：
  /_settings  更新所有索引的。
  {index}/_settings     更新一个或多个索引的settings。
 
-##### 修改备份数
+#### 修改备份数
 
 ```shell
 PUT /twitter/_settings
@@ -156,7 +157,7 @@ PUT /twitter/_settings
 }
 ```
 
-##### 设置索引属性默认值
+#### 设置索引属性默认值
 
 用null把某个属性设置成默认值
 
@@ -169,7 +170,7 @@ PUT /twitter/_settings
 }
 ```
 
-##### 设置索引读写
+#### 设置索引读写
 
 index.blocks.read_only：设为true,则索引以及索引的元数据只可读
 index.blocks.read_only_allow_delete：设为true，只读时允许删除。
@@ -179,13 +180,13 @@ index.blocks.metadata：设为true，则索引元数据不可读写。
 
 blocks 阻塞
 
-#### 索引模板
+### 索引模板 Index Templates
 
 在创建索引时，为每个索引写定义信息可能是一件繁琐的事情。ES提供了索引模板功能，可以定义一个索引模板，模板中定义好settings、mapping、以及一个模式定义来匹配创建的索引。
 
 模板只在索引创建时被参考，修改模板不会影响已创建的索引。
 
-##### 创建索引模板
+#### 创建索引模板
 
 ```shell
 # 新增/修改名为tempae_1的模板，匹配名称为te* 或 bar*的索引创建。
@@ -196,7 +197,7 @@ PUT _template/template_1
     "number_of_shards": 1
   },
   "mappings": {
-    "type1": {
+    "_doc": {
       "_source": {
         "enabled": false
       },
@@ -214,7 +215,7 @@ PUT _template/template_1
 }
 ```
 
-##### 查看索引模板
+#### 查看索引模板
 
 ```shell
 GET /_template/template_1
@@ -223,13 +224,13 @@ GET /_template/template_1,template_2
 GET /_template
 ```
 
-##### 删除模板
+#### 删除模板
 
 ```shell
 DELETE /_template/template_1
 ```
 
-####  打开/关闭索引
+###  打开/关闭索引 Open / Close Index API
 
 ```shell
 POST /my_index/_close
@@ -239,7 +240,7 @@ POST /my_index/_open
 关闭的索引不能进行读写操作，几乎不占集群开销。
 关闭的索引可以打开，打开走的是正常的恢复流程。
 
-#### 收缩索引 (Shrink Index)
+### 收缩索引 Shrink Index
 
 索引的分片数是不可更改的，如要减少分片数可以通过收缩方式收缩为一个新的索引。新索引的分片数必须是原分片数的因子值，如原分片数是8，则新索引的分片数可以为4、2、1 。
 
@@ -285,7 +286,7 @@ GET _cat/recovery?v
 GET _cluster/health
 ```
 
-#### 拆分索引 (Split Index)
+### 拆分索引 Split Index
 
 当索引的分片容量过大时，可以通过拆分操作将索引拆分为一个倍数分片数的新索引。
 能拆分为几倍由创建索引时指定的index.number_of_routing_shards 路由分片数决定。
@@ -298,6 +299,13 @@ GET _cluster/health
 5 → 30 (split by 6) 
 
 **注意**：只有在**创建时指定了index.number_of_routing_shards 的索引才可以进行拆分**，ES7开始将不再有这个限制。
+
+拆分的工作原理:
+
+1. 创建一个新的索引，其定义与源索引完全相同，但主分片数较多；
+2. 将源索引中的段复制到目标索引（这个过程会比较耗时）；
+3. 1
+4. 它恢复了目标索引，好像它是一个刚重新打开的封闭索引。
 
 **准备一个索引来做拆分：**
 
@@ -340,7 +348,7 @@ GET _cat/recovery?v
 GET _cluster/health
 ```
 
-#### Rollover Index 
+### Rollover Index 
 
 别名滚动指向新创建的索引
 
@@ -416,15 +424,7 @@ POST /logs_write/_rollover
 }
 ```
 
-#### 索引监控
-
-查看索引状态信息
-https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html
-
-```shell
-GET /_stats
-GET /index1,index2/_stats
-```
+### 索引段 Indices Segments
 
 查看索引段信息
 
@@ -459,9 +459,17 @@ GET /_shard_stores
 GET /_shard_stores?status=green
 ```
 
-#### 状态管理
+### 状态管理 Indices Stats
 
-##### Clear Cache 清理缓存
+查看索引状态信息
+https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html
+
+```shell
+GET /_stats
+GET /index1,index2/_stats
+```
+
+### 清理缓存Clear Cache 
 
 ```shell
 POST /twitter/_cache/clear
@@ -470,16 +478,22 @@ POST /kimchy,elasticsearch/_cache/clear
 POST /_cache/clear
 ```
 
-##### Refresh
+### Refresh
 
 重新打开读取索引。周期性自动执行。
 
+解析： 当索引一个文档，文档先是被存储在内存里面，默认1秒后，会进入文件系统缓存，这样该文档就可以被搜索到，但是该文档还没有存储到磁盘上，如果机器宕机了，数据就会丢失。因此fresh实现的是从内存到文件系统缓存的过程。
+
 ```shell
+# 刷新单个索引
+POST / twitter / _refresh
+# 刷新多个索引
 POST /kimchy,elasticsearch/_refresh
+# 刷新所有索引
 POST /_refresh
 ```
 
-##### Flush
+### Flush
 
 将缓存在内存中的索引数据刷新到持久存储中
 
@@ -487,7 +501,7 @@ POST /_refresh
 POST twitter/_flush
 ```
 
-##### Force merge 强制段合并
+### 强制段合并Force merge 
 
 ```shell
 POST /kimchy/_forcemerge?only_expunge_deletes=false&max_num_segments=100&flush=true
@@ -501,9 +515,56 @@ max_num_segments  合并为几个段，默认1
 only_expunge_deletes  是否只合并含有删除文档的段，默认false
 flush 合并后是否刷新，默认true
 
-#### 映射
+### 索引设置 Index Settings
 
-##### Mapping 映射是什么
+#### 静态索引设置 Static index settings
+
+只有在创建索引时或关闭索引时才能设置
+
+1. index.number_of_shards 
+   主分片数， 默认值是5，上限是1024。只能在创建索引的时候设定， 不管是索引关闭与否，都不能修改。
+2. index.shard.check_on_startup 
+   在索引打开前是否检查分片，取值如下：
+   + false 不检查
+   + checksum 检查物理损坏
+   + true 检查物理和逻辑损坏
+   + fix 7.0版本将会被废弃
+3. index.codec 
+   默认数据压缩策略是`LZ4`，也可以设置成`best_compression` ，压缩率更高，但是性能较慢
+4. index.routing_partition_size
+   自定义分片的路由值，默认为1。这个值必须小于`index.number_of_shards`，除非`index.number_of_shards`等于1
+
+#### 动态索引设置 Dynamic index settings
+
+随时可以修改
+
+1. index.number_of_replicas
+2. index.auto_expand_replicas
+3. index.refresh_interval
+4. index.max_result_window
+5. index.max_inner_result_window
+6. index.max_rescore_window
+7. index.max_docvalue_fields_search
+8. index.max_script_fields
+9. index.max_ngram_diff
+10. index.max_shingle_diff
+11. index.blocks.read_only
+12. index.blocks.read_only_allow_delete
+13. index.blocks.read
+14. index.blocks.write
+15. index.blocks.metadata
+16. index.max_refresh_listeners
+17. index.highlight.max_analyzed_offset
+18. index.max_terms_count
+19. index.routing.allocation.enable
+20. index.routing.rebalance.enable
+21. index.gc_deletes
+22. index.max_regex_length
+23. index.default_pipeline
+
+### 索引映射 Mapping 
+
+#### Mapping 映射是什么
 
 映射定义索引中有什么字段、字段的类型等结构信息。相当于数据库中表结构定义，或 solr中的schema。因为lucene索引文档时需要知道该如何来索引存储文档的字段。
 ES中支持手动定义映射，动态映射两种方式。
@@ -526,7 +587,7 @@ PUT test
 
 **映射类别 Mapping type 废除说明**
 
-ES最先的设计是用索引类比关系型数据库的数据库，用mapping type 来类比表，一个索引中可以包含多个映射类别。这个类比存在一个严重的问题，就是当多个mapping type中存在同名字段时（特别是同名字段还是不同类型的），在一个索引中不好处理，因为搜索引擎中只有 索引-文档的结构，不同映射类别的数据都是一个一个的文档（只是包含的字段不一样而已）
+ES最先的设计是用索引类比关系型数据库，用mapping type 来类比表，一个索引中可以包含多个映射类别。这个类比存在一个严重的问题，就是当多个mapping type中存在同名字段时（特别是同名字段还是不同类型的），在一个索引中不好处理，因为搜索引擎中只有 索引-文档的结构，不同映射类别的数据都是一个一个的文档（只是包含的字段不一样而已）
 
 从6.0.0开始限定仅包含一个映射类别定义（ "index.mapping.single_type": true ），兼容5.x中的多映射类别。从7.0开始将移除映射类别。
 为了与未来的规划匹配，请现在将这个唯一的映射类别名定义为“_doc”,因为索引的请求地址将规范为：PUT {index}/_doc/{id} and POST {index}/_doc
@@ -612,7 +673,7 @@ POST _reindex
 }
 ```
 
-#### 动态映射
+#### 动态映射 Dynamic Mapping
 
 ES中提供的重要特性，让我们可以快速使用ES，而不需要先创建索引、定义映射。 
 如我们直接向ES提交文档进行索引，ES将自动为我们创建data索引、_doc 映射、类型为 long 的字段 count
@@ -659,11 +720,11 @@ PUT my_index/_doc/1
 }
 ```
 
-#### 字段类型
+#### 字段类型 Field datatypes
 
 https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
 
-**Core Datatypes 核心类型**
+##### Core Datatypes 核心类型
 
 string
     **text** and **keyword** 
@@ -682,6 +743,7 @@ Range datatypes     范围
 
 Array datatype
     **array**数组就是多值，不需要专门的类型
+	事实上没有array类型，
 Object datatype
     **object** ：表示值为一个JSON 对象 
 Nested datatype
@@ -709,39 +771,7 @@ Percolator type
 join datatype
     Defines parent/child relation for documents within the same index
 
-##### 字段定义属性介绍
-
-字段的type (Datatype)定义了如何索引存储字段值，还有一些属性可以让我们根据需要来覆盖默认的值或进行特别定义。
-
-https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-params.html
-
-analyzer   指定分词器
-normalizer   指定标准化器
-boost        指定权重值
-coerce      强制类型转换
-copy_to    值复制给另一字段
-doc_values  是否存储docValues
-dynamic
-enabled    字段是否可用
-fielddata
-eager_global_ordinals
-format    指定时间值的格式
-ignore_above 忽略大于或超长的部分
-
-ignore_malformed 忽略异常的值，如需要数值，实际上的值是字符
-index_options 索引选项
-index 是否索引
-fields 多重字段
-norms 是否标准化
-null_value 给null指定一个值
-position_increment_gap 多值字段，短语查询，位置的增量
-properties 如果是对象，对象里边还会有属性
-search_analyzer 搜索时的分词器
-similarity 相关性计算算法或模型
-store 是否存储，默认为false
-term_vector 词项向量
-
-##### Multi Field 多重字段
+##### 多重字段 Multi Field
 
 当我们需要对一个字段进行多种不同方式的索引时，可以使用fields多重字段定义。如一个字符串字段即需要进行text分词索引，也需要进行keyword 关键字索引来支持排序、聚合；或需要用不同的分词器进行分词索引。
 
@@ -804,7 +834,39 @@ GET my_index/_search
 }
 ```
 
-##### 元字段
+#### 字段定义属性 Mapping parameters
+
+字段的type (Datatype)定义了如何索引存储字段值，还有一些属性可以让我们根据需要来覆盖默认的值或进行特别定义。
+
+https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-params.html
+
+analyzer   指定分词器
+normalizer   指定标准化器
+boost        指定权重值
+coerce      强制类型转换
+copy_to    值复制给另一字段
+doc_values  是否存储docValues
+dynamic
+enabled    字段是否可用
+fielddata
+eager_global_ordinals
+format    指定时间值的格式
+ignore_above 忽略大于或超长的部分
+
+ignore_malformed 忽略异常的值，如需要数值，实际上的值是字符
+index_options 索引选项
+index 是否索引
+fields 多重字段
+norms 是否标准化
+null_value 给null指定一个值
+position_increment_gap 多值字段，短语查询，位置的增量
+properties 如果是对象，对象里边还会有属性
+search_analyzer 搜索时的分词器
+similarity 相关性计算算法或模型
+store 是否存储，默认为false
+term_vector 词项向量
+
+#### 元字段 Meta-Fields
 
 元字段是ES中定义的文档字段，有以下几类：
 
@@ -832,12 +894,12 @@ The original JSON representing the body of the document.
 **Other meta-field**
 **_meta**  Application specific metadata.
 
-#### 索引别名
+### 索引别名 Index Aliases
 
-##### 别名的用途
+#### 别名的用途
 
 如果希望一次查询可查询多个索引。
-如果希望通过索引的视图来操作索引，就像数据库库中的视图一样。
+如果希望通过索引的视图来操作索引，就像数据库中的视图一样。
 
 索引的别名机制，就是让我们可以以视图的方式来操作集群中的索引，这个视图可是多个索引，也可是一个索引或索引的一部分。
 

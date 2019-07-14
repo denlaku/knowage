@@ -1,6 +1,6 @@
 ## String
 
-在我所接触的编程语言中，字符串都是比比可少的，占据着非常重要的地位，java也是如此。在java中字符串是对象，而且还是不可变对象，对应着类`java.lang.String`，在日常的编程中用的非常多。
+在我所接触的编程语言中，字符串都是必不可少的，占据着非常重要的地位，java也是如此。在java中字符串是对象，而且还是不可变对象，对应着类`java.lang.String`，在日常的编程中用的非常多。
 
 ### String的特性
 
@@ -16,48 +16,48 @@ String的底层用char数组`value`存储数据，并且此value字段被final�
 
 ### String常用方法
 
-- boolean equals(Object anObject)
-  将此字符串与指定的对象比较。
+1、boolean equals(Object anObject)
+将此字符串与指定的对象比较。
 
--  int length()
-  返回该字符串的长度
+2、int length()
+返回该字符串的长度
 
-- int compareToIgnoreCase(String str)
-  按字典顺序比较两个字符串，不考虑大小写。
+3、int compareToIgnoreCase(String str)
+按字典顺序比较两个字符串，不考虑大小写。
 
-- String toLowerCase()
-  使用默认语言环境的规则将此 String 中的所有字符都转换为小写。
+4、String toLowerCase()
+使用默认语言环境的规则将此 String 中的所有字符都转换为小写。
 
-- String toUpperCase()
-  使用默认语言环境的规则将此 String 中的所有字符都转换为大写
+5、String toUpperCase()
+使用默认语言环境的规则将此 String 中的所有字符都转换为大写
 
-- String trim()
-  返回字符串的副本，忽略前导空白和尾部空白。
+6、String trim()
+返回字符串的副本，忽略前导空白和尾部空白。
 
-- String replaceAll(String regex, String replacement)
-  使用给定的 replacement 替换此字符串所有匹配给定的正则表达式的子字符串。
+7、String replaceAll(String regex, String replacement)
+使用给定的 replacement 替换此字符串所有匹配给定的正则表达式的子字符串。
 
-- boolean startsWith(String prefix)
-  测试此字符串是否以指定的前缀开始。
+8、boolean startsWith(String prefix)
+测试此字符串是否以指定的前缀开始。
 
-- int indexOf(String str)
-   返回指定子字符串在此字符串中第一次出现处的索引。
+9、int indexOf(String str)
+返回指定子字符串在此字符串中第一次出现处的索引。
 
-- int lastIndexOf(String str)
-  返回指定子字符串在此字符串中最右边出现处的索引。
+10、int lastIndexOf(String str)
+返回指定子字符串在此字符串中最右边出现处的索引。
 
-- boolean endsWith(String suffix)
-  测试此字符串是否以指定的后缀结束。
+11、boolean endsWith(String suffix)
+测试此字符串是否以指定的后缀结束。
 
-- String intern()
-  返回字符串对象的规范化表示形式。
+12、String intern()
+返回字符串对象的规范化表示形式。
 
-- static String valueOf(primitive data type x)
-  返回给定data type类型x参数的字符串表示形式。
+13、static String valueOf(primitive data type x)
+返回给定data type类型x参数的字符串表示形式。
 
-- static String format(String format, Object... args) 
+14、static String format(String format, Object... args) 
 
-  格式化字符
+格式化字符
 
 ### String的intern()方法
 
@@ -105,6 +105,8 @@ public class StringTest {
 
 从上面的例子可以看出，在以下场景中，字符串对象会被缓存：
 
-- 显示调用String的intern方法的时候; 
-- 直接声明字符串字面常量的时候，例如: String s1 = "aaa";
--  字符串直接常量相加的时候，例如: String s1 = "a" + "b";  
+1、显示调用String的intern方法的时候; 
+
+2、直接声明字符串字面常量的时候，例如: String s1 = "aaa";
+
+3、字符串直接常量相加的时候，例如: String s1 = "a" + "b";  

@@ -306,6 +306,10 @@ mysql server层又包含连接层和sql层。连接层又包含通信协议、�
 
 ## MySql存储引擎
 
+查看系统支持的所有引擎类型： `show engines`
+
+查看默认引擎： ` show variables like '%engine'` 
+
 ### 主要存储引擎
 
 | 存储引擎 | 特点                                                 | 引用场景      |
@@ -325,11 +329,21 @@ mysql server层又包含连接层和sql层。连接层又包含通信协议、�
 
 
 
+## MySQL表
 
+查看所有的表： `show tables`
 
-## MySql索引
+查看建表语句：`show create table dept`
 
-### **什么是索引？**
+修改表名：`alter table oldName rename to newName`
+
+修改字段类型：`alter table tabName modify fieldName dataType`
+
+修改字段名：`alter table tabName change oldFieldName newFieldName dataType`
+
+添加字段：`alter table tabName add fieldName dataType`
+
+## MySQL索引
 
 索引本质上是一种排好序查找快的数据结构，有助于mysql快速高效返回符合条件的数据，提高数据查找效率。
 
@@ -338,34 +352,34 @@ mysql server层又包含连接层和sql层。连接层又包含通信协议、�
 
 **劣势**：索引实际上也是一种表，保存了主键和索引字段，并指向实体表的记录，也是需要占用磁盘空间的。同时索引也会降低更新表的速度，对insert、update、delete都有影响。因为索引字段的数据发生变化，也需要对响应的索引进行根性。索引只是提高查询速度的一个因素，对于数据量大的表，还是需要建立最优秀的索引，并且还要优化查询语句。
 
-### **索引分类**
-
 **单只索引**：一个索引只包含一个列，一个表可以有多个单只索引。
 **唯一索引**：索引列的值必须唯一，但允许有空值。
 **复合索引**：一个索引包含多个列。
 
 ### 索引语法
 
-**创建索引**
+#### 创建索引
 
 ```sql
 create [unique] index indexName on tableName(column1, column2);
 alter tableName add index [indexName] on(column1, column2);
 ```
 
-**删除索引**
+#### 删除索引
 
 ```sql
 drop index [indexName] on tableName;
 ```
 
-**查看索引**
+#### 查看索引
 
 ```sql
 show index from tableName;
 ```
 
-### 需要创建索引情况
+### 索引创建原则
+
+#### 需要创建索引情况
 
 主键自动建立唯一索引；
 频繁作为查询条件的字段应该创建索引；
@@ -373,7 +387,7 @@ show index from tableName;
 查询中排序的字段，排序字段若通过索引去访问，将大大提高排序速度；
 查询中统计或分组字段；
 
-### 不需要创建索引情况
+#### 不需要创建索引情况
 
 表记录太少；
 经常增删改的表；
@@ -381,34 +395,47 @@ show index from tableName;
 频繁跟新的字段不宜创建索引，因为每次跟新不仅更新了记录，还会更新索引，加重了IO负担；
 where中用不到的字段不创建索引；
 
+#### 单键/组合索引选择
+
+在高并发下倾向创建组合索引
+
 ### 索引分类
 
-BTree索引
+#### BTree索引
 
-Hash索引
+每个磁盘块包含几个**数据项**和**指针**
+真是的数据存储在叶子节点；非叶子节点不存储数据，只存储指引搜索方向的数据项
+3层的B+树，可以表示上百万的数据
 
-full-text索引
+#### Hash索引
 
-R-Tree索引
+#### full-text索引
 
-## Explain
+#### R-Tree索引
 
-**id**
+## 性能优化
 
-id相同，执行顺序由上而下
+### explain/describe
+
+模拟优化器执行SQL语句，了解mysql是如何处理SQL的，分析查询语句或表结构的性能瓶颈。
+
+#### id
+
+id相同，可以认为是同一组，执行顺序由上而下。所有组中id越大，优先级越高。
 id不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行。
-id相同、不同同时存在
+id相同不同，同时存在
 
-**select_type**
+#### select_type
 
 SIMPLE：简单的select查询，不包含子查询或union
 PRIMARY： 查询中最外层的select(如两表做union或者存在子查询的外层的表操作为PRIMARY,内层的操作为UNION)
 SUBQUERY：select或where列表中的子查询
-DERIVED：在from中包含的子查询
+DEPENDENT SUBQUERY：连接查询中第二个或后面的select语句，取决于外面的查询
+DERIVED：衍生表，在from中包含的子查询
 UNION：
 UNION RESULT：union获得的结果集
 
-**type**
+#### type
 
 all：全表扫描
 index：全索引扫描
@@ -418,31 +445,31 @@ eq_ref： 唯一索引扫描，对于每一个索引键，表中只有一条记�
 const：表示通过索引一次就找到了，const用于比较primary key和unique索引。返回结果只有一行数据。
 system：表只有一行记录(等于系统表)，是const类型的特例。
 
-**possible_keys**
+#### possible_keys
 
 显示可能应用到这张表的索引，一个或多个。
 查询上涉及到的字段上若存在索引，则该索引被列出，但不一定被查询实际使用
 
-**key**
+#### key
 
 实际中使用的索引。若果为null，则没有使用索引。
 若果查询中使用了覆盖索引，则索引只出现在key列表中。
 **覆盖索引**：查询的字段和是建立索引的字段，也就是说select的字段从索引中就能获取，不用读取数据行；
 
-**key_len**
+#### key_len
 
 表示索引中使用的字节数，可以通过该列结算查询中使用的索引长度。在不损失精确的情况下，长度越短越好。
 key_len显示的值为索引字段的最大可能长度，并非实际使用长度。ken_len根据表定义计算而得，不是通过表内检索出的。
 
-**ref**
+#### ref
 
 显示了索引的哪一列被使用了，如果可能的话是一个常数。哪些列或常量被用于查找索引列上的值。
 
-**rows**
+#### rows
 
 根据表统计信息及索引选用情况，大致估算找出所需记录所要读取的行数。
 
-**Extra**
+#### Extra
 
 Using filesort：对数据使用一个外部的索引排序，而不是按照表内的索引进行排序；无法利用索引完成排序的操作称“**文件排序**”。
 
@@ -450,27 +477,125 @@ Using temporary：使用了临时表保存中间结果，对查询结果排序�
 
 Using index：使用了**覆盖索引**，避免访问表中的数据行。如果同时出现了Using where表明索引被用来执行索引键值的查找。
 
-Using Where：
+Using Where：使用了where过滤
 
-Using join buffer：
+Using join buffer：使用了连接缓存
 
-Impossible where：
+Impossible where：where字句的值总是false，不能用来获取任何数据
 
 Select tables optimized away：
 
-distinct：
+distinct：优化distinct操作
 
-## MySql优化
+### 索引优化
+
+1、最好全值匹配
+
+2、最佳左前缀法则
+
+3、不在索引列上左任何操作
+
+4、存储引擎不能使用索引中范围条件右边的列
+
+5、尽量使用覆盖索引（查询列和索引列一致）
+
+6、MySQL使用不等于无法使用索引
+
+7、is null/is not null无法使用索引
+
+8、like以通配符开头索引会失效
+
+9、减少使用or，避免索引失效
+
+对于单键索引，尽量选择针对当前query过滤性更好的索引
+
+在选择组合索引的时候，当前query过滤性能更好的字段，在索引字段顺序中，越靠前越好
 
 ### 查询优化
 
+1、永远小表驱动大表
+
+```sql
+-- 当B表的数据集小于A表的数据集时，用in优先于exists
+select * from A where id in (select id from B)
+-- 当B表的数据集大于A表的数据集时，用exists优先于in
+select * from A where exists (select id from B where A.id=B.id)
+-- A表和B表id字段应该建立索引
+```
+
+2、order by优化
+	尽量使用index排序，避免FilterSort方式排序；
+	尽可能在索引列上完成排序，遵守索引键最佳前缀原则；
+
+3、group by实质是先排序后分组，遵守索引最佳左前缀规则；能写在where条件就不要写在having中；
+
 ### 慢查询日志
 
-### show profile
-
-```reStructuredText
-
+```sql
+-- 查看查询日志
+show variables like '%slow_query_log%';
+-- 慢sql阈值时间
+show variables like 'long_query_time';
+-- 开启慢查询日志
+set global slow_query_log=1;
+-- 设置慢sql阈值时间
+set global long_query_time=10;
+-- 查看慢日志条数
+show global status like '%Slow_queries%';
 ```
+
+#### mysqldumpslow工具
+
+mysqldumpslow.exe --help
+
+得到返回数据最多的10条SQL
+mysqldumpslow -s t -r 10 slow.log
+
+得到访问次数最多的10条SQL
+mysqldumpslow  -s c -r 10 slow.log
+
+得到按时间排序前10条SQL里面含有左连接的查询语句
+mysqldumpslow  -s t -t 10 -g 'left join' slow.log
+
+建议使用more命令，避免爆屏
+mysqldumpslow  -s t -t 10 -g 'left join' slow.log|more
+
+#### show profile
+
+分析当前会话中执行语句资源消耗情况
+
+show profile语法
+
+```sql
+SHOW PROFILE [type [, type] ... ]
+    [FOR QUERY n]
+    [LIMIT row_count [OFFSET offset]]
+
+type: {
+    ALL
+  | BLOCK IO
+  | CONTEXT SWITCHES
+  | CPU
+  | IPC
+  | MEMORY
+  | PAGE FAULTS
+  | SOURCE
+  | SWAPS
+}
+```
+
+**show profiles**语句与**show profile**显示的分析信息一起显示在当前会话过程中执行的语句的资源使用情况
+
+```sql
+-- 
+show profiles
+-- 
+show profile all for query 3;
+```
+
+#### 批量数据脚本
+
+
 
 ## 锁
 
@@ -498,11 +623,144 @@ unlock tables;
 
 
 
-select @@tx_isolation;
+## 事务
 
-show variables like '%REPEATABLE-READ%';
+查看默认事务级别： select @@tx_isolation;
 
+## 分区
 
+### 范围分区
+
+```sql
+CREATE TABLE employees (
+    id INT NOT NULL,
+    fname VARCHAR(30),
+    lname VARCHAR(30),
+    hired DATE NOT NULL DEFAULT '1970-01-01',
+    separated DATE NOT NULL DEFAULT '9999-12-31',
+    job_code INT NOT NULL,
+    store_id INT NOT NULL
+)
+PARTITION BY RANGE (store_id) (
+    PARTITION p0 VALUES LESS THAN (6),
+    PARTITION p1 VALUES LESS THAN (11),
+    PARTITION p2 VALUES LESS THAN (16),
+    PARTITION p3 VALUES LESS THAN (21)
+);
+```
+
+### 列表分区
+
+```sql
+CREATE TABLE employees (
+    id INT NOT NULL,
+    fname VARCHAR(30),
+    lname VARCHAR(30),
+    hired DATE NOT NULL DEFAULT '1970-01-01',
+    separated DATE NOT NULL DEFAULT '9999-12-31',
+    job_code INT,
+    store_id INT
+)
+PARTITION BY LIST(store_id) (
+    PARTITION pNorth VALUES IN (3,5,6,9,17),
+    PARTITION pEast VALUES IN (1,2,10,11,19,20),
+    PARTITION pWest VALUES IN (4,12,13,14,18),
+    PARTITION pCentral VALUES IN (7,8,15,16)
+);
+```
+
+### 列分区
+
+#### RANGE COLUMNS分区
+
+```sql
+CREATE TABLE r1 (
+    a INT,
+    b INT
+)
+PARTITION BY RANGE (a)  (
+    PARTITION p0 VALUES LESS THAN (5),
+    PARTITION p1 VALUES LESS THAN (MAXVALUE)
+);
+```
+
+#### 列表列分区
+
+```sql
+CREATE TABLE customers_1 (
+    first_name VARCHAR(25),
+    last_name VARCHAR(25),
+    street_1 VARCHAR(30),
+    street_2 VARCHAR(30),
+    city VARCHAR(15),
+    renewal DATE
+)
+PARTITION BY LIST COLUMNS(city) (
+    PARTITION pRegion_1 VALUES IN('Oskarshamn', 'Högsby', 'Mönsterås'),
+    PARTITION pRegion_2 VALUES IN('Vimmerby', 'Hultsfred', 'Västervik'),
+    PARTITION pRegion_3 VALUES IN('Nässjö', 'Eksjö', 'Vetlanda'),
+    PARTITION pRegion_4 VALUES IN('Uppvidinge', 'Alvesta', 'Växjo')
+);
+```
+
+### HASH分区
+
+```sql
+CREATE TABLE employees (
+    id INT NOT NULL,
+    fname VARCHAR(30),
+    lname VARCHAR(30),
+    hired DATE NOT NULL DEFAULT '1970-01-01',
+    separated DATE NOT NULL DEFAULT '9999-12-31',
+    job_code INT,
+    store_id INT
+)
+PARTITION BY HASH(store_id)
+PARTITIONS 4;
+```
+
+### key分区
+
+```sql
+CREATE TABLE k1 (
+    id INT NOT NULL PRIMARY KEY,
+    name VARCHAR(20)
+)
+PARTITION BY KEY()
+PARTITIONS 2;
+```
+
+###  子分区
+
+```sql
+CREATE TABLE ts (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+    SUBPARTITION BY HASH( TO_DAYS(purchased) )
+    SUBPARTITIONS 2 (
+        PARTITION p0 VALUES LESS THAN (1990),
+        PARTITION p1 VALUES LESS THAN (2000),
+        PARTITION p2 VALUES LESS THAN MAXVALUE
+    );
+```
+
+```sql
+CREATE TABLE ts (id INT, purchased DATE)
+    PARTITION BY RANGE( YEAR(purchased) )
+    SUBPARTITION BY HASH( TO_DAYS(purchased) ) (
+        PARTITION p0 VALUES LESS THAN (1990) (
+            SUBPARTITION s0,
+            SUBPARTITION s1
+        ),
+        PARTITION p1 VALUES LESS THAN (2000) (
+            SUBPARTITION s2,
+            SUBPARTITION s3
+        ),
+        PARTITION p2 VALUES LESS THAN MAXVALUE (
+            SUBPARTITION s4,
+            SUBPARTITION s5
+        )
+    );
+```
 
 
 

@@ -171,7 +171,7 @@ location "/hive/student_ptn";
 
 ```sql
 # 查看persons表的表分区
-show partitions persons;
+show partitions person_pt;
 # 添加表分区
 alter table student_ptn add partition (city="beijing");
 # 删除分区
@@ -280,17 +280,25 @@ drop table new_student;
 truncate table student_ptn;
 ```
 
+#### count(*)和count(1)显示为0
+
+进入hive shell，输入`set hive.compute.query.using.stats=false`，然后运行下查询语句，发现正常。
+
+DESCRIBE EXTENDED $table_name;
+
+正解：
+
+ANALYZE TABLE $table_name COMPUTE STATISTICS;
+
+ANALYZE TABLE $table_name partition(p=$1) COMPUTE STATISTICS;
 
 
 
 
 
-
-
-
-
-
-
+```
+beeline -u jdbc:hive2://
+```
 
 
 

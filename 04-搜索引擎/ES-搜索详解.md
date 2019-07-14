@@ -40,7 +40,7 @@ GET /bank/_search?q=city:b*&size=0
   }
 }
 # --------------------------------------------
-# 有没有文档匹配某个查询， terminate_after 限定每个分片去多少文档
+# 有没有文档匹配某个查询， terminate_after 限定每个分片取多少文档
 GET /bank/_search?q=city:b*&size=0&terminate_after=1
 # 查询结果
 {

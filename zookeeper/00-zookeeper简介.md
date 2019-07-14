@@ -10,6 +10,8 @@ zookeeper是一个开源的分布式协调服务，由雅虎创建并开源。zo
 + Follower
 + Observer
 
+事务请求的唯一调度者和处理者。保证事务处理的顺序性。集群内部个服务器之间的调度者。
+
 一个 ZooKeeper 集群同一时刻只能有一个 Leader，其他都是 Follower 或 Observer。zooKeeper 默认只有 Leader 和 Follower 两种角色，没有 Observer 角色。为了使用 Observer 模式，在任何想变成Observer节点的配置文件中加:peerType=observer，并在所有 server 的配置文件中，配置成 observer 模式的 server 的那行配置追加 :observer
 
 #### **2 、节点读写服务分工**

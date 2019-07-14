@@ -48,11 +48,21 @@ vim /etc/security/limits.d/20-nproc.conf
 修改为
 \* soft nproc 2048
 
+**关于soft nproc 与 soft nofile**
+
+> soft nproc: 可打开的文件描述符的最大数(软限制)
+>
+> hard nproc： 可打开的文件描述符的最大数(硬限制)
+>
+> soft nofile：单个用户可用的最大进程数量(软限制)
+>
+> hard nofile：单个用户可用的最大进程数量(硬限制)
+
 **问题四**：max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
 解决：切换到root用户修改配置sysctl.conf
 vim /etc/sysctl.conf 
 添加下面配置：
-vm.max_map_count=655360
+vm.max_map_count=655360  # 定义了一个进程能拥有的最多的内存区域，默认为65536
 并执行命令：
 sysctl -p
 切换到es的用户。
@@ -174,6 +184,14 @@ elasticsearch.url: "http://10.10.10.11:9200"
 **启动**
 ./bin/kibana
 访问地址：http://10.10.10.11:5601
+
+**数据批量导入**
+
+```shell
+curl -H "Content-Type: application/json" -XPOST "10.10.10.11:9200/bank/_doc/_bulk?pretty&refresh" --data-binary "@accounts.json"
+```
+
+
 
 ### IKAnalyzer集成
 

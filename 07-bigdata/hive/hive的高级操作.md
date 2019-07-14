@@ -91,6 +91,8 @@ Hive 对文件中字段的分隔符默认情况下只支持单字节分隔符，
 
 #### 1、使用RegexSerDe正则表达式解析
 
+SerDe (Serializer and Deserializer)
+
 创建表
 
 ```sql

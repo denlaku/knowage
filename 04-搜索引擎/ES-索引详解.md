@@ -1,6 +1,6 @@
-## 认识分词器
+# 认识分词器
 
-### Analyzer 分析器
+## Analyzer 分析器
 
 在ES中一个Analyzer 由下面三种组件组合而成：
 
@@ -10,7 +10,7 @@
 
 **token filter**：词项过滤器，对tokenizer分出的词进行过滤处理。如转小写、停用词处理、同义词处理。一个analyzer可包含0个或多个词项过滤器，按配置顺序进行过滤。
 
-#### 测试分词器
+### 测试分词器
 
 ```shell
 POST _analyze
@@ -29,11 +29,11 @@ POST _analyze
 POST /_analyze
 {
   "analyzer": "ik_smart",
-  "text": "Undertow是一个采用 Java 开发的灵活的高性能 Web 服务器"
+  "text": "Undertow是一个采用Java开发的灵活的高性能Web服务器"
 }
 ```
 
-#### 内建的character filter
+### 内建的character filter
 
 HTML Strip Character Filter
 	**html_strip** ：过滤html标签，解码HTML entities like &amp;. 
@@ -84,7 +84,7 @@ Pattern Replace Character Filter
 	https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-pattern-replace-charfilter.html
 	**pattern_replace** ：进行正则表达式替换。
 
-#### 内建的Tokenizer
+### 内建的Tokenizer
 
 Standard Tokenizer
 Letter Tokenizer

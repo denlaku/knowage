@@ -1,0 +1,8 @@
+FeignAutoConfiguration feign的自动配置
+
+
+
+@EnableFeignClients导入了类FeignClientsRegistrar
+
+FeignClientsRegistrar通过ClassPathScanningCandidateComponentProvider扫描，获取所有的拥有@FeignClient注解的接口，@FeignClient必须用在接口上，否则会报错；注册成FeignClientFactoryBean的工厂bean定义
+

@@ -14,9 +14,13 @@ Shuffle的本义是洗牌、混洗，把一组有一定规则的数据尽量转�
 
 从Map输出到Reduce输入的整个过程可以广义地称为Shuffle。Shuffle横跨Map端和Reduce端，在Map端包括Spill过程，在Reduce端包括copy和sort过程
 
+![1552345341175](D:\denlaku.git\knowage\07-bigdata\hadoop\imgs\1552345341175.png)
+
 ### Spill过程
 
 Spill过程包括输出、排序、溢写、合并等步骤。
+
+![1552345324716](D:\denlaku.git\knowage\07-bigdata\hadoop\imgs\1552345324716.png)
 
 **Collect**
 
@@ -46,7 +50,11 @@ Spill线程为这次Spill过程创建一个磁盘文件：从所有的本地目�
 
 每一次Spill过程就会最少生成一个out文件，有时还会生成index文件，Spill的次数也烙印在文件名中。
 
+![1552345294960](D:\denlaku.git\knowage\07-bigdata\hadoop\imgs\1552345294960.png)
+
 在Spill线程如火如荼的进行SortAndSpill工作的同时，Map任务不会因此而停歇，而是一无既往地进行着数据输出。Map还是把数据写到kvbuffer中，那问题就来了：只顾着闷头按照bufindex指针向上增长，kvmeta只顾着按照Kvindex向下增长，是保持指针起始位置不变继续跑呢，还是另谋它路？如果保持指针起始位置不变，很快bufindex和Kvindex就碰头了，碰头之后再重新开始或者移动内存都比较麻烦，不可取。Map取kvbuffer中剩余空间的中间位置，用这个位置设置为新的分界点，bufindex指针移动到这个分界点，Kvindex移动到这个分界点的-16位置，然后两者就可以和谐地按照自己既定的轨迹放置数据了，当Spill完成，空间腾出之后，不需要做任何改动继续前进。
+
+![1552345376236](D:\denlaku.git\knowage\07-bigdata\hadoop\imgs\1552345376236.png)
 
 Map任务总要把输出的数据写到磁盘上，即使输出数据量很小在内存中全部能装得下，在最后也会把数据刷到磁盘上。
 
@@ -64,7 +72,7 @@ Merge过程怎么知道产生的Spill文件都在哪了呢？从所有的本地�
 
 最终的索引数据仍然输出到Index文件中。
 
-**Copy**
+### **Copy**
 
 Reduce任务通过HTTP向各个Map任务拖取它所需要的数据。每个节点都会启动一个常驻的HTTP server，其中一项服务就是响应Reduce拖取Map数据。当有MapOutput的HTTP请求过来的时候，HTTP server就读取相应的Map输出文件中对应这个Reduce部分的数据通过网络流输出给Reduce。
 
@@ -74,15 +82,11 @@ Reduce任务拖取某个Map对应的数据，如果在内存中能放得下这�
 
 有些Map的数据较小是可以放在内存中的，有些Map的数据较大需要放在磁盘上，这样最后Reduce任务拖过来的数据有些放在内存中了有些放在磁盘上，最后会对这些来一个全局合并。
 
-**Merge Sort**
+### **Merge Sort**
 
 这里使用的Merge和Map端使用的Merge过程一样。Map的输出数据已经是有序的，Merge进行一次合并排序，所谓Reduce端的sort过程就是这个合并的过程。一般Reduce是一边copy一边sort，即copy和sort两个阶段是重叠而不是完全分开的。
 
 Reduce端的Shuffle过程至此结束。
-
-
-
-
 
 
 

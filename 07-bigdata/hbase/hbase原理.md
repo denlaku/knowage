@@ -2,9 +2,15 @@
 
 ### 系统架构
 
+#### 错误图解
+
 ![](../imgs/1228818-20180402125111282-1966599087.png)
 
 注意：应该是每一个 RegionServer 就只有一个 HLog，而不是一个 Region 有一个 HLog。
+
+#### 正确图解
+
+![img](imgs/1228818-20180402125236874-140096659.png)
 
 从HBase的架构图上可以看出，HBase中的组件包括Client、Zookeeper、HMaster、HRegionServer、HRegion、Store、MemStore、StoreFile、HFile、HLog等，接下来介绍他们的作用。
 
@@ -16,7 +22,7 @@
 
 **-ROOT-**：记录了.META.表的 Region 信息，-ROOT-只有一个 Region，无论如何不会分裂
 
-2、Client 访问用户数据前需要首先访问 ZooKeeper，找到-ROOT-表的 Region 所在的位置，然 后访问-ROOT-表，接着访问.META.表，最后才能找到用户数据的位置去访问，中间需要多次 网络操作，不过 client 端会做 cache 缓存。
+2、Client 访问用户数据前需要首先访问 ZooKeeper，找到-ROOT-表的 Region 所在的位置，然 后访问-ROOT-表，接着访问.META.表，最后才能找到用户数据的位置去访问，中间需要多次网络操作，不过 client 端会做 cache 缓存。
 
 #### ZooKeeper 
 
@@ -46,9 +52,9 @@
 
 2、RegionServer 负责 Split 在运行过程中变得过大的 Region，负责 Compact 操作
 
-可以看到，client 访问 HBase 上数据的过程并不需要 master 参与（寻址访问 zookeeper 和 RegioneServer，数据读写访问 RegioneServer），Master 仅仅维护者 Table 和 Region 的元数据信息，负载很低。
+可以看到，client 访问 HBase 上数据的过程并不需要 master 参与（寻址访问 zookeeper 和 RegioneServer，数据读写访问 RegioneServer），Master仅仅维护者Table和Region的元数据信息，负载很低。
 
-.META. 存的是所有的 Region 的位置信息，那么 RegioneServer 当中 Region 在进行分裂之后 的新产生的 Region，是由 Master 来决定发到哪个 RegioneServer，这就意味着，只有 Master 知道 new Region 的位置信息，所以，由 Master 来管理.META.这个表当中的数据的 CRUD
+.META. 存的是所有的 Region 的位置信息，那么 RegioneServer 当中 Region 在进行分裂之后 的新产生的 Region，是由Master 来决定发到哪个 RegioneServer，这就意味着，只有 Master 知道 new Region 的位置信息，所以，由 Master 来管理.META.这个表当中的数据的 CRUD
 
 所以结合以上两点表明，在没有 Region 分裂的情况，Master 宕机一段时间是可以忍受的。
 

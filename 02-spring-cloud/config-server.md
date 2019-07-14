@@ -1,6 +1,16 @@
-配置文件访问方式
+### 配置中心服务端
 
-EnvironmentController
+ConfigServerAutoConfiguration
+
+ConfigServerMvcConfiguration
+	EnvironmentController
+	ResourceController
+
+EncryptionAutoConfiguration
+ConfigServerEncryptionConfiguration
+	EncryptionController
+
+配置文件访问方式
 
 ```
 /{name}/{profiles:.*[^-].*}
@@ -14,4 +24,10 @@ EnvironmentController
 /{label}/{name}-{profiles}.yml
 /{label}/{name}-{profiles}.yaml
 ```
+
+支持native、git、svn
+
+
+
+### 配置中心客户端
 
